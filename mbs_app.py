@@ -69,15 +69,11 @@ n_last = 30
 # ============================================
 # scratch streamlit
 # --------------------------------------------
-
 usecols = ['id', 'created_at', 'geo', 'place', 'coordinates', 'text',
            'text_en', 'truncated', 'name', 'screen_name']
 df = pd.read_csv(input_file,
                  parse_dates=['created_at'],
                  usecols=usecols)
-
-df.head(3).info()
-df.tail(3).info()
 
 # =============================================
 # monkey learn
@@ -89,7 +85,7 @@ df_geo = extract_place(df_kex)
 df_geo.to_csv(DATA_DIR/'mbs_geo.csv', index=False)
 
 df_pn = add_sentiment_digit(df_kex)
-df_agg = aggregate_sentiment(df_pn, freq='6H')
+df_agg = aggregate_sentiment(df_pn, freq='12H')
 # '120S' '2H' '1D'
 df_agg.to_csv(DATA_DIR/'mbs_agg.csv', index=False)
 

@@ -97,7 +97,6 @@ def query_text_mbs(BT):
     COUNT = 'count=100'
     LAND_MARK = 'Marienplatz'
     RADIUS = 20.0  # km
-#   RT = urllib.parse.quote_plus(' exclude:retweets')
     RT = urllib.parse.quote_plus('-is:retweet')
     URL_TWITTER_API = "https://api.twitter.com/1.1/search/tweets.json?"
     HEADERS = {"Authorization": "Bearer {}".format(BT)}
