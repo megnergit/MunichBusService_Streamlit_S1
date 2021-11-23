@@ -68,12 +68,13 @@ your own account at each service, and plug them in the code.
 -----------------------------------------------------------------
 ## Summary of Tech Stack
 
-|                               |                             | 
+| For                           | Tech used                   | 
 |-------------------------------|-----------------------------|
 |Coding                         | Python                      |
 |Data source                    | Twitter                     |   
 |Translation                    | DeepL                       |   
-|Sentiment / Keyword extraction | MonkeyLearn                 |   
+|Sentiment analysis             | MonkeyLearn                 |   
+|Keyword extraction             | MonkeyLearn                 |   
 |Visualization                  | plotly, folium, wordcloud   |
 |Webpage                        | streamlit                   |   
 |Deployment                     | Heroku                      |   
@@ -136,6 +137,8 @@ There are a few things that may change the situations above.
    - continuous campaign?
 
 5. Switch the data source to Google Analytics.
+   (and go for a cloud solution in passing, including Google's NLP
+   services to replace MonkeyLearn API)
 
 
 6. Switch to commercial plans
