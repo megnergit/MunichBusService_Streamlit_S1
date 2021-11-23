@@ -2,8 +2,6 @@ pathlib==1.0.1
 pandas==1.3.4
 streamlit==1.2.0
 streamlit_autorefresh==0.0.1
-pretty_errors
-urlli3b==1.2.20
 requests==2.25.0
 geopandas.tools==0.10.2
 monkeylearn==3.6.0
