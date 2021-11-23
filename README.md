@@ -27,9 +27,9 @@ safari to the newest version. I had this problem myself.
 <b style="color:salmon">NOTE 3 </b> 
 
 As you see below, the App uses a number of APIs. The **API tokens are
-stored locally(( in the script 'config.py', and not given in the
-GitHub repo. You can still obtain the API keys yourself (by creating
-your own account at each service), and plug them in the code.
+stored locally** in the script `config.py`, and not given in the
+GitHub repo. You can still obtain the API keys yourself by creating
+your own account at each service, and plug them in the code.
 
 -----------------------------------------------------------------
 ## What the App does
@@ -68,6 +68,8 @@ your own account at each service), and plug them in the code.
 -----------------------------------------------------------------
 ## Summary of Tech Stack
 
+|                               |                             | 
+|-------------------------------|-----------------------------|
 |Coding                         | Python                      |
 |Data source                    | Twitter                     |   
 |Translation                    | DeepL                       |   
@@ -97,9 +99,9 @@ There are a few difficulties to answer the questions.
 
 2. (almost) None of the tweets come with geo tags.
 
-   - In the map, there are two big circles near
-      + Maxvorstadt
-      + Pasing
+   In the map, there are two big circles near
+      - Maxvorstadt
+      - Pasing
 
   The locations only reflect that the tweets come from Munich, as the
   coordinate (11.57540E, 48.13714N; near Maxvorstadt) is automatically
@@ -107,7 +109,7 @@ There are a few difficulties to answer the questions.
   'Munich'. The granularity of the localization is not enough.
 
 -----------------------------------------------------------------
-## Actions 
+## Actions to take
 
 There are a few things that may change the situations above.
 
