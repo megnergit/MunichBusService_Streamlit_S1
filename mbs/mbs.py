@@ -1,4 +1,5 @@
-import time
+import pandas as pd
+import numpy as np
 import urllib
 from pathlib import Path
 import config
@@ -6,12 +7,9 @@ import requests
 from geopandas.tools import geocode
 import re
 from monkeylearn import MonkeyLearn
-import pandas as pd
-import numpy as np
 import plotly.graph_objs as go
 from plotly.colors import sample_colorscale
 from wordcloud import WordCloud
-import folium
 from folium import Circle
 from datetime import datetime
 import config
@@ -210,11 +208,11 @@ current record length {prev_length} {since_id_str}',
 
             with open(LOG_FILE_COLOR, 'a') as log_file_color:
                 print(
-                    f'<b style="color:salmon">{t1} <b> \
-                      <b style="color:coral">max_id<b> \
+                    f'<b style="color:salmon">{t1} </b> \
+                      <b style="color:indianred">max_id</b> \
 {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} \
 <b style="color:mediumaquamarine">ret</b>: {length_retrieved: 3} \
-<b style="color:firebrick">tot<b>: {length_after+prev_length: 5}', file=log_file_color)
+<b style="color:firebrick">tot</b>: {length_after+prev_length: 5}', file=log_file_color)
 
             revised_length = revised_length + len(df)
             time.sleep(t_sleep)
