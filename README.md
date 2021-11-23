@@ -10,25 +10,26 @@ comments? What they are not satifised with?
 
 <b style="color:salmon">NOTE 1 <b> 
 
-This is a mock-up dashboard. The content does not reflect the actual
-sentiments of the tweets. This is because I used up the credits to
-send the queries to the sentiment-analysis API by MonkeyLearn during
-the code-development phase. Currently App is working with a dummy
-sentiment-analysis function that returns random values. 
+This is a **mock-up** dashboard. The content **does not reflect the
+actual sentiments** of the tweets. This is because I **used up the
+credits** to send the queries to the sentiment-analysis API by
+MonkeyLearn during the code-development phase. Currently App is
+working with a dummy sentiment-analysis function that returns random
+values.
 
 <b style="color:salmon">NOTE 2 <b> 
 
-If you are using safari browser, and do not see anything on the
-browser when you open the URL of the App, you should update your
+If you are using **safari** browser, and do not see anything on the
+browser when you open the URL of the App, you should **update** your
 safari to the newest version. I had this problem myself.
 
 
 <b style="color:salmon">NOTE 3 <b> 
 
-As you see below, the App uses a number of APIs. The API tokens are
-stored locally in the script 'config.py', and not given in the GitHub
-repo. You can still obtain the API keys yourself (by creating your own
-account at each service), and plug them in the code.
+As you see below, the App uses a number of APIs. The **API tokens are
+stored locally(( in the script 'config.py', and not given in the
+GitHub repo. You can still obtain the API keys yourself (by creating
+your own account at each service), and plug them in the code.
 
 -----------------------------------------------------------------
 ## What the App does
