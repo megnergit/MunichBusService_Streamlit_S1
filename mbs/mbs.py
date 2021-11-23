@@ -1,43 +1,44 @@
 import time
 import urllib
-import os
+# import os
 from pathlib import Path
-import plotly
-import plotly.express as px
-import json
+# import plotly
+# import plotly.express as px
+# import json
 import config
-from requests_oauthlib import OAuth1Session
+# from requests_oauthlib import OAuth1Session
 import requests
 from geopandas.tools import geocode
 import re
-import deepl
-import tweepy
+# import deepl
+# import tweepy
 from monkeylearn import MonkeyLearn
 import pandas as pd
 import numpy as np
-import typing
+# import typing
 
 import plotly.graph_objs as go
 from plotly.colors import sample_colorscale
-from plotly.subplots import make_subplots
-from plotly.offline import plot
+# from plotly.subplots import make_subplots
+# from plotly.offline import plot
 
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 import folium
-from folium import Marker, GeoJson, Circle
-from folium.plugins import HeatMap
-import geopandas as gpd
+from folium import Circle
+# from folium.plugins import HeatMap
+# import geopandas as gpd
 
-import webbrowser
+# import webbrowser
 from datetime import datetime
-import importlib
+# import importlib
 import config
-import pdb
 import ast
-import streamlit as st
+# import streamlit as st
 import leafmap.foliumap as folium
+import pdb
+import pretty_errors
 # ====================================
 # Authentication
 # ====================================
@@ -123,8 +124,8 @@ def collect_tweet_mbs(BT):
 
 
 def polling_tweet_mbs(BT, DEEPL_AK,
-                      outfile='tweet_cleaned.csv',
-                      n_stopper=100, t_sleep=10) -> None:
+                      outfile='./data/tweet_bus_de_en.csv',
+                      n_stopper=3, t_sleep=1) -> None:
     # -----------------------------
     # if there is outfile, read it
     # to get length of records
@@ -139,6 +140,7 @@ def polling_tweet_mbs(BT, DEEPL_AK,
         df_prev.to_csv(backup_file, index=False)
 
         prev_length = len(df_prev)
+        revised_length = prev_length
         max_id = df_prev['id'].max()
         max_id_str = str(max_id)
 
@@ -172,8 +174,8 @@ current record length {prev_length} {since_id_str}',
         since_id = 0
         max_id = since_id
         max_id_str = str(max_id)
+        revised_length = prev_length
 
-    revised_length = prev_length
     df_list = []
     URL, HEADERS = query_text_mbs(BT)
 
@@ -201,8 +203,9 @@ current record length {prev_length} {since_id_str}',
             clean_r = clean_response(r)
             df = response_to_csv(clean_r)
             length_retrieved = len(df)
-            df_list.append(df)
+            df, usage = add_text_en(df, DEEPL_AK)
 
+            df_list.append(df)
             df = pd.concat(df_list, axis=0)
             length_before = len(df)
 
@@ -210,8 +213,6 @@ current record length {prev_length} {since_id_str}',
             length_after = len(df)
 
             df.sort_values(['id'], inplace=True)
-
-            df, usage = add_text_en(df, DEEPL_AK)
 
             if Path(outfile).exists():
                 df.to_csv(outfile, mode='a', header=False, index=False)
@@ -223,20 +224,20 @@ current record length {prev_length} {since_id_str}',
 \033[96mret: \033[0m{length_retrieved:3} \
 \033[94mtot: \033[0m{length_after+prev_length: 5}\033[0m')
 
-            with open(LOG_FILE_COLOR, 'a') as log_file_color:
-                print(f'{t1} max_id {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} \
-ret: {length_retrieved:3} \
-tot: {length_after+prev_length:5}', end='', file=log_file)
+            with open(LOG_FILE, 'a') as log_file:
+                print(
+                    f'{t1} max_id {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} ret: {length_retrieved:3} tot: {length_after+prev_length:5}', end='', file=log_file)
 
             with open(LOG_FILE_COLOR, 'a') as log_file_color:
                 print(
                     f'<b style="color:salmon">{t1} <b> \
-                      <b style="color:coral>max_id<b> \
+                      <b style="color:coral">max_id<b> \
 {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} \
 <b style="color:mediumaquamarine">ret</b>: {length_retrieved: 3} \
 <b style="color:firebrick">tot<b>: {length_after+prev_length: 5}', file=log_file_color)
 
-            revised_length(len(df))
+            revised_length = revised_length + len(df)
+#            print('here1', revised_length)
             time.sleep(t_sleep)
 
         except (KeyError, IndexError) as e:
@@ -245,6 +246,7 @@ tot: {length_after+prev_length:5}', end='', file=log_file)
             break
 
     # terminal / text log file / for web page
+#    print('here2', revised_length)
     print(
         f'\033[94mrevised record length\033[0m {revised_length} {max_id_str}')
     with open(LOG_FILE, 'a') as log_file:
@@ -260,6 +262,14 @@ revised record length {revised_length} {max_id_str}',
             file=log_file_color)
 
 # steelblue skyblue plum orchid darkorchid
+# -------
+
+
+# df = pd.read_csv('./data/tweet_bus_de_en.csv')
+# df
+# LOG_FILE_COLOR
+
+# -------
 # --------------------------------------------
 # - flag when there is missing tweets
 # --------------------------------------------
@@ -818,17 +828,33 @@ def add_text_en(df, DEEPL_AK):
 
     i = 0
     n_text = 50
+#    n_text = 1
     while n_text*i < len(df):
         text = '&' + '&'.join(
             ['text='+d for d in df.loc[n_text*i:n_text*(i+1)-1, 'text']])
+        # here send request to DeepL
+#        pdb.set_trace()
         response = requests.request("POST", URL_DEEPL_QUERY+text).json()
+#        pdb.set_trace()
         df.loc[n_text*i:n_text*(i+1)-1, 'text_en'] = [t['text']
                                                       for t in response['translations']]
         i = i + 1
+#        break
 
+    # check how much credit still remains
     URL_DEEPL_USAGE_QUERY = URL_DEEPL_USAGE + auth_key
     usage = requests.request("POST", URL_DEEPL_USAGE_QUERY).json()
-    print(f"\033[91mUsage:\033[93m {usage['character_count']}\033[0m")
+    print(
+        f"\033[91mUsed:\033[93m {usage['character_count']}\033[0m/{usage['character_limit']}")
+
+#    pdb.set_trace()
     return df, usage
+
+# ====================================
+# scratch add_text_en
+# ====================================
+# response['translations']
+# outfile = './data/tweet_bus_de_en.csv'
+# df = pd.read_csv(outfile)
 
 # ====================================

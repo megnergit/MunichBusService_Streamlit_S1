@@ -60,7 +60,6 @@ LOG_FILE_COLOR = Path('./log/log_file_color.txt')
 NOTE_FILE = Path('./note/summary.yaml')
 
 DEEPL_AK = config.DEEPL_API_KEY
-DEEPL_AK = "6edca6ec-321e-1241-76dc-dd3a3bd10942:fx"
 
 size = 640
 input_file = DATA_DIR/'tweet_bus_de_en.csv'

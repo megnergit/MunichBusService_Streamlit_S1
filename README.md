@@ -91,7 +91,7 @@ below.
 
 There are a few difficulties to answer the questions. 
 
-1. The number of accessible tweets are too small. We have about 30
+1. The number of accessible tweets are too small. We have about 10-30
    tweets per day on the bus, and not all of them are useful to
    extract clear sentiments. Much more (not clear how much at the
    moment) would be necessary to be statistically significant on the

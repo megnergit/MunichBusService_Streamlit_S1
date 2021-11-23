@@ -69,7 +69,7 @@
             
         There are a few difficulties to answer the questions. 
         <ol>
-        <li> The number of accessible tweets are too small. We have about **30
+        <li> The number of accessible tweets are too small. We have about **10-30
         tweets per day** on the bus in Munich, and not all of them are 
         useful to extract clear **sentiments**. Much more is  necessary to be 
         statistically  significant in the **keyword** collections.</li>
