@@ -8,7 +8,7 @@ comments? What they are not satifised with?
 
 ## CAUTIONS
 
-<b style="color:salmon">NOTE 1 <b> 
+<b style="color:salmon">NOTE 1 </b> 
 
 This is a **mock-up** dashboard. The content **does not reflect the
 actual sentiments** of the tweets. This is because I **used up the
@@ -17,14 +17,14 @@ MonkeyLearn during the code-development phase. Currently App is
 working with a dummy sentiment-analysis function that returns random
 values.
 
-<b style="color:salmon">NOTE 2 <b> 
+<b style="color:salmon">NOTE 2 </b> 
 
 If you are using **safari** browser, and do not see anything on the
 browser when you open the URL of the App, you should **update** your
 safari to the newest version. I had this problem myself.
 
 
-<b style="color:salmon">NOTE 3 <b> 
+<b style="color:salmon">NOTE 3 </b> 
 
 As you see below, the App uses a number of APIs. The **API tokens are
 stored locally(( in the script 'config.py', and not given in the
