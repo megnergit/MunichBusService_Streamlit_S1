@@ -64,6 +64,7 @@ account at each service), and plug them in the code.
 
 6. Deploy the App on `Heroku`. 
 
+-----------------------------------------------------------------
 ## Summary of Tech Stack
 
 |Coding                         | Python                      |
@@ -104,6 +105,9 @@ There are a few difficulties to answer the questions.
   assigned when the tweet-authors open their geo-location as
   'Munich'. The granularity of the localization is not enough.
 
+-----------------------------------------------------------------
+## Actions 
+
 There are a few things that may change the situations above.
 
 1. Switch to the commercial plan to get an access to the whole
@@ -131,8 +135,7 @@ There are a few things that may change the situations above.
 5. Switch the data source to Google Analytics.
 
 
------------------------------------------------------------------
-## The APIs are all free tiers
+6. Switch to commercial plans
 
    The App strictly uses free services only. The following are the
    restrictions, and what would be different in the commercial
