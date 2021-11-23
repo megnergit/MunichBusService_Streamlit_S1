@@ -1,10 +1,10 @@
-# How People Like Munich Bus Servce
+# How People Like Munich Bus Service
 
 How people are satisfied  with the bus service in Munich? We collected
 **tweets** within 20 km of Munich, and measure the **sentiments** in the texts.
 Find how people are satisfied, and
 how people are not. Where is the street that has most unsatisfied
-comments? What they are not satifised with?
+comments? What they are not satisfied with?
 
 ## CAUTIONS
 
@@ -79,8 +79,8 @@ your own account at each service, and plug them in the code.
 |Webpage                        | streamlit                   |   
 |Deployment                     | Heroku                      |   
 
------------------------------------------------------------------
-## Conculsions
+---------------------------------------------------------------
+## Conclusions
 
 The purpose of the project is to see if I could answer three questions
 below.
@@ -131,23 +131,32 @@ There are a few things that may change the situations above.
    - London
    - Kyoto
 
-4. Run a campaign to persuade people to tweet with their geo tags
+4. Collect tweets in all languages, instead of German only. DeepL API
+   can detect the source language automatically. This would be
+   effective from the point of view of the higher linguistic diversity
+   in the public transportations in Munich than the general demography
+   in the city.
+
+5. Run a campaign to persuade people to tweet with their geo tags
    open.
+
    - synchronized with the night of museums / shopping?
+   - souvenirs
+     + free transportation ticket, free museum ticket, T-shirts, caps
    - continuous campaign?
 
-5. Switch the data source to Google Analytics.
+6. Switch the data source to Google Analytics.
    (and go for a cloud solution in passing, including Google's NLP
    services to replace MonkeyLearn API)
 
-
-6. Switch to commercial plans
+-----------------------------------------------------------------
+## Commercial plans overview
 
    The App strictly uses free services only. The following are the
    restrictions, and what would be different in the commercial
-   services.
+   plans.
 
-   [Twitter]
+   **[Twitter]**
 
    - The tweets that the App can search is a 'sample' (a part) of the
      whole tweets, not the entire collection. It is not clear how much
@@ -165,15 +174,14 @@ There are a few things that may change the situations above.
      plan. It is not clear how this would differ in the commercial
      plan.
    
-
-   [MonkeyLearn]
+   **[MonkeyLearn]**
    
    - The number of queries are restricted up to 1000 per month, i.e.
      about 30 per day. This is barely enough, or slightly less than
      the number of the tweets expected for a day. The restriction is
      lifted in the commercial plan.
 
-   [DeepL]
+   **[DeepL]**
 
    - The number of queries are restricted up to 500,000 characters
      per month. The restriction is lifted in the commercial plan,

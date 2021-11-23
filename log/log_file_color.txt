@@ -91,3 +91,4 @@
 <b style="color:salmon">2021-11-23 20:54:12 </b> <b style="color:slateblue">revised record length </b>112 1463 1865 9278 1291 534
 <b style="color:salmon">2021-11-23 20:54:57 </b> <b style="color:plum"> current record length</b> 112 1463 1860 2316 1241 602
 <b style="color:salmon">2021-11-23 20:54:57 </b>                       <b style="color:indianred">max_id</b> 1463 1865 9278 1291 534 <b style="color:deeppink">ret</b>:   0 <b style="color:firebrick">tot</b>:   112
+<b style="color:salmon">2021-11-23 22:54:58 </b>                       <b style="color:indianred">max_id</b> 1463 2553 5101 7590 790 <b style="color:deeppink">ret</b>:   1 <b style="color:firebrick">tot</b>:   113
