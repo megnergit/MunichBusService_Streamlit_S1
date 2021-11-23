@@ -1,0 +1,93 @@
+    note1: <b style="color:salmon">CAUTION 1</b> </br>
+        This is a **mock-up** dashboard. The content does not reflect the actual
+        sentiments of the tweets. This is because I used up the credits to
+        send the queries to the sentiment-analysis API by MonkeyLearn during
+        the code-development phase. Currently App is working with a dummy
+        sentiment-analysis function that returns random values.
+
+    note2: <b style="color:salmon">CAUTION 2</b> </br>
+        If you are using **safari** browser, and do **not see anything** on the
+        browser when you open the URL of the App, you should **update** your
+        safari to the newest version. I had this problem myself.
+
+    note3: <b style="color:salmon">CAUTION 3</b> </br>
+        As you see below, the App uses a number of APIs. The **API tokens** are
+        stored locally in the script 'config.py', and not given in the GitHub
+        repo. You can still obtain the API keys yourself by creating your own
+        account at each service, and plug them in the code.
+
+    what: "### What the App does 
+
+        1. Collect **tweets** that contain the word '**bus**', and 
+        are sent from **20 km** from MarienPlatz. **Twitter API** was used.
+        The majority of the tweets about a bus are from '**MVVticker**'
+        reporting delays, accidents, and coming back to the
+        normality. Tweets by 'MVVticker' are removed.
+
+        2. Translate German texts to **English**, using **DeepL API**, for 
+        the sentiment analysis.
+
+        3. **Sentiments** and **keywords** are extracted from the texts. 
+        **MonkeyLearn API** was used.The sentiments are weighted by the 
+        'confidence' (that comes with the sentiment analysis), and are 
+        averaged to the overall sentiment. The neutral sentiments are 
+        removed (weighted to zero).
+
+        4. Use **`plotly`** (for the diagrams), **`foilum`** (map), 
+        and **`wordcloud`** (wordcloud) to create the **visualizations**.
+
+        5. Put the visualizations into a **dynamic webpage** using 
+        **`streamlit`**.
+
+        6. **Deploy** the App on **`Heroku`**."
+
+    table: "### Tech Stack 
+
+        |A                              | B                           |
+        |-------------------------------|-----------------------------|
+        |Coding                         | Python                      |
+        |Data source                    | Twitter                     |   
+        |Translation                    | DeepL                       |   
+        |Sentiment / Keyword extraction | MonkeyLearn                 |   
+        |Visualization                  | plotly, folium, wordcloud   |
+        |Webpage                        | streamlit                   |   
+        |Deployment                     | Heroku                      |   
+        "
+
+    questions: "### Questions
+            
+        How people are satisfied  with the bus service in Munich?
+        The purpose of the project is to see if we could answer the three 
+        questions below. 
+        <ol>
+        <li> **If** people in Munich are satisfied with their bus service.</li>
+        <li> **What** people are satisfied and unsatisfied with.</li>
+        <li> **Which part of the city**, people are most unsatisfied.</li>
+        </ol>
+        "
+    conclusions: "### Conclusions
+            
+        There are a few difficulties to answer the questions. 
+        <ol>
+        <li> The number of accessible tweets are too small. We have about **10-30
+        tweets per day** on the bus in Munich, and not all of them are 
+        useful to extract clear **sentiments**. Much more is  necessary to be 
+        statistically  significant in the **keyword** collections.</li>
+        <li> Almost **none** of the tweets accessible in a free plan come with 
+        **geo tags**. The granularity of the localization is not enough to 
+        identify the hot spots of dissatisfaction. </li>
+        </ol>
+        Further discussion would be found in my [GitHub repo](https://github.com/megnergit/MunichBusService_Streamlit_S1/blob/main/README.md).
+        "
+    map_caption: "### Lack of Geo Tag Infos
+
+        In the map below, there are two big circles near
+        **Maxvorstadt** and **Pasing**, each actually consists of 
+        many concentric circles. 
+        The location, Maxforstat, for instance, only reflects that 
+        the tweets come from the city Munich. 
+        When the tweet-authors open their geo-location as
+        'Munich', the coordinate (11.57540E, 48.13714N; near Maxvorstadt) 
+        is automatically  assigned.  The same probably applies to Pasing. 
+        The granularity is way too coarse to identify a street. 
+        "

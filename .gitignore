@@ -1,0 +1,6 @@
+.DS_Store
+._*
+*~
+[a-z]*.html
+*.ipynb
+
