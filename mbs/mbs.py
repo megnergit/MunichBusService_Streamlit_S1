@@ -1,41 +1,21 @@
 import time
 import urllib
-# import os
 from pathlib import Path
-# import plotly
-# import plotly.express as px
-# import json
 import config
-# from requests_oauthlib import OAuth1Session
 import requests
 from geopandas.tools import geocode
 import re
-# import deepl
-# import tweepy
 from monkeylearn import MonkeyLearn
 import pandas as pd
 import numpy as np
-# import typing
-
 import plotly.graph_objs as go
 from plotly.colors import sample_colorscale
-# from plotly.subplots import make_subplots
-# from plotly.offline import plot
-
 from wordcloud import WordCloud
-# import matplotlib.pyplot as plt
-
 import folium
 from folium import Circle
-# from folium.plugins import HeatMap
-# import geopandas as gpd
-
-# import webbrowser
 from datetime import datetime
-# import importlib
 import config
 import ast
-# import streamlit as st
 import leafmap.foliumap as folium
 import pdb
 import pretty_errors
@@ -93,7 +73,7 @@ def query_text_mbs(BT):
     QUERY2 = 'q=mvv'
     RECENT = 'result_type=recent'
     LANG = 'lang=de'
-#    LANG = 'lang=en'
+    # LANG = 'lang=en'
     # EXTENDED = 'tweet_mode=extended'
     COUNT = 'count=100'
     LAND_MARK = 'Marienplatz'
@@ -237,7 +217,6 @@ current record length {prev_length} {since_id_str}',
 <b style="color:firebrick">tot<b>: {length_after+prev_length: 5}', file=log_file_color)
 
             revised_length = revised_length + len(df)
-#            print('here1', revised_length)
             time.sleep(t_sleep)
 
         except (KeyError, IndexError) as e:
@@ -246,7 +225,6 @@ current record length {prev_length} {since_id_str}',
             break
 
     # terminal / text log file / for web page
-#    print('here2', revised_length)
     print(
         f'\033[94mrevised record length\033[0m {revised_length} {max_id_str}')
     with open(LOG_FILE, 'a') as log_file:
@@ -262,14 +240,6 @@ revised record length {revised_length} {max_id_str}',
             file=log_file_color)
 
 # steelblue skyblue plum orchid darkorchid
-# -------
-
-
-# df = pd.read_csv('./data/tweet_bus_de_en.csv')
-# df
-# LOG_FILE_COLOR
-
-# -------
 # --------------------------------------------
 # - flag when there is missing tweets
 # --------------------------------------------
