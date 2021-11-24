@@ -1,1 +1,1 @@
-web: streamlit run mbs_app.py -p $PORT
+web: streamlit run mbs_app.py
