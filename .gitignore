@@ -1,4 +1,5 @@
 .DS_Store
+.streamlit
 ._*
 *~
 [a-z]*.html
