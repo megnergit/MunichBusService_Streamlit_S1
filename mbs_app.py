@@ -145,7 +145,7 @@ df_words.sort_values(['frac'], ascending=False, inplace=True)
 
 col1, col2, col3 = st.columns((2, 0.9, 0.9))
 with col1:
-    st.markdown('### Where people are satisfied/dissatified?')
+    st.markdown('### Where people are satisfied/dissatisfied?')
     m_1.to_streamlit(height=size*1)
 
 with col2:
@@ -154,7 +154,7 @@ with col2:
     st.plotly_chart(fig_pn, use_container_width=True)
 
 with col3:
-    st.markdown('### Satisfied/dissatified with...')
+    st.markdown('### Satisfied/dissatisfied with...')
     st.image(wc.to_image())
     st.dataframe(df_words)
 

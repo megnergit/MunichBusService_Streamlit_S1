@@ -577,7 +577,7 @@ def visualize_pn(df, size=640, vertical=True):
     score_scale = 0.5 * (score + 1.0)
     score_color = sample_colorscale(cs, score_scale)[0]
 
-    axis_dict1 = dict(tickfont=dict(size=20),
+    axis_dict1 = dict(tickfont=dict(size=16),
                       tickmode='array',
                       ticks='inside',
                       tickvals=list(range(len(df_pn))),
@@ -585,9 +585,9 @@ def visualize_pn(df, size=640, vertical=True):
 
     axis_dict2 = dict(autorange=False,
                       title=dict(text='<- Negatve | Positive ->',
-                                 font=dict(size=20)),
+                                 font=dict(size=16)),
                       range=[-1.01, 1.01],
-                      tickfont=dict(size=20))
+                      tickfont=dict(size=16))
 
     if vertical:
         trace = go.Bar(x=df_pn['confidence_digit'],
@@ -597,7 +597,7 @@ def visualize_pn(df, size=640, vertical=True):
                        marker=dict(colorscale='Agsunset'),
                        hovertext=df_pn['text_en'],
                        hoverinfo='text',
-                       hoverlabel=dict(font=dict(size=30)))
+                       hoverlabel=dict(font=dict(size=20)))
 
         xdict = axis_dict2
         ydict = axis_dict1
@@ -612,7 +612,7 @@ def visualize_pn(df, size=640, vertical=True):
                        marker=dict(colorscale='Agsunset'),
                        hovertext=df_pn['text_en'],
                        hoverinfo='text',
-                       hoverlabel=dict(font=dict(size=30)))
+                       hoverlabel=dict(font=dict(size=20)))
 
         xdict = axis_dict1
         ydict = axis_dict2
