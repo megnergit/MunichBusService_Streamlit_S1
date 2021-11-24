@@ -30,9 +30,7 @@ if __name__ == '__main__':
     DATA_DIR = Path('./data')
     LOG_FILE = Path('./log/log_file.txt')
     LOG_FILE_COLOR = Path('./log/log_file_color.txt')
-#    NOTE_FILE = Path('./note/summary.yaml')
 
-#    freq = '12H'
     polling_tweets(
         BT, DEEPL_AK,
         outfile=outfile,

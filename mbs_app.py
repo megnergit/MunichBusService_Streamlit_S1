@@ -9,20 +9,15 @@ import yaml
 # Authentication
 # ====================================
 
-# AK = config.API_KEY  # not really necessary
-# AKS = config.API_KEY_SECRET  # not really necessary
-# BT = config.BEARER_TOKEN
-
 LOG_FILE = Path('./log/log_file.txt')
 LOG_FILE_COLOR = Path('./log/log_file_color.txt')
 NOTE_FILE = Path('./note/summary.yaml')
 DATA_DIR = Path('./data')
+ST_KEY = config.ST_KEY
 
 size = 640
-# input_file = DATA_DIR/'tweet_bus_de_en.csv'
 n_last = 30
-# freq = '12H'
-# '120S' '2H' '1D'
+# freq = '12H' # '120S' '2H' '1D'
 # # center = (11.57540, 48.13714)
 # ============================================
 # scratch streamlit
@@ -32,12 +27,7 @@ df_agg = pd.read_csv(DATA_DIR / 'mbs_agg.csv',
                      index_col='created_at_tz')
 
 df_agg.index.freq = df_agg.index.inferred_freq
-# df_agg['created_at'] = df_agg['created_at'].astype('datetime64[ns]')
-# df_agg['created_at_tz'] = df_agg['created_at_tz'].astype('datetime64[ns]')
-
 df_pn = pd.read_csv(DATA_DIR / 'mbs_pn.csv')
-# df_pn.head(3)
-# df_pn.info()
 
 df_pn['created_at'] = df_pn['created_at'].astype('datetime64[ns]')
 df_pn['created_at_tz'] = df_pn['created_at_tz'].astype('datetime64[ns]')
@@ -88,7 +78,7 @@ with open(NOTE_FILE, 'r') as s:
 # streamlit scratch
 # =====================================================================
 st.set_page_config(layout='wide')
-count = st_autorefresh(interval=1000 * 1200, limit=16, key="sagasitemiyou")
+count = st_autorefresh(interval=1000 * 1200, limit=16, key=ST_KEY)
 
 # --------------------------------------------
 # 1. row : cautions
@@ -168,12 +158,5 @@ st.dataframe(df_kex.drop(
     height=size)
 
 # --------------------------------------------
-# check duplication
+# END
 # --------------------------------------------
-# x = 1.4632553510175908e+18
-# str(x)
-# df.info()
-# df = pd.read_csv('data/tweet_bus_de_en_2021-11-24.csv')
-# len(df)
-# Path('.').cwd()
-# df = pd.read_csv(

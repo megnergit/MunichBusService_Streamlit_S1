@@ -10,3 +10,6 @@ BEARER_TOKEN = "AAAAAAAAAAAAAAAAAAAAAIUwVwEAAAAAwl4hTV%2FATWG%2BbRyDSpfjGhsMt2A%
 
 # DeepL
 DEEPL_API_KEY = "6edca6ec-321e-1241-76dc-dd3a3bd10942:fx"
+
+# streamlit
+ST_KEY = "sagasitemiyou"

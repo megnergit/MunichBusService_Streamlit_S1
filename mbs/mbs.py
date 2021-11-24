@@ -563,6 +563,9 @@ def get_mkl_ex(df, MKL_AK, MKL_EX_MODEL_ID):
     return df_kex
 
 # ============================================
+# ============================================
+# visualizations
+# ============================================
 
 
 def visualize_pn(df, size=640, vertical=True):
@@ -817,92 +820,6 @@ def visualize_count(df, size):
     return fig
 
 
-# ============================================
-# play with wordcloud
-# --------------------------------------------
-
-
-def create_wordcloud(df, size=640):
-    width = size
-    height = size  # quadratisch
-    cm = 'inferno'  # 'plasma'  # 'Dark2' # 'Spectral'  # 'Plasma' 'RdBu', 'Pastel2'
-    text = ' '.join(df['keyword'].to_list())
-    # wordcloud = WordCloud(background_color=None,
-    wordcloud = WordCloud(background_color='white',
-                          colormap=cm,  # from matplotlib
-                          prefer_horizontal=0.9,
-                          width=width, height=height,
-                          mode='RGBA').generate(text)
-    return wordcloud
-
-
-def visualize_wc(wc):
-    #    layout = go.Layout(width=wc.width, height=wc.height,
-    layout = go.Layout(margin=dict(l=0, r=0, t=20, b=0),
-                       xaxis=dict(visible=False),
-                       yaxis=dict(visible=False))
-    trace = go.Image(z=wc, xaxis='x', yaxis='y')
-    fig = go.Figure(data=[trace], layout=layout)
-    return fig
-
-# --------------------------------------------
-
-
-def plot_sentiment(df_stx):
-
-    #    size = 1024 * 2
-    df_geo = extract_place(df_stx)
-    center = get_lat_lon()
-    tiles = 'openstreetmap'
-    # tiles = 'Stamen Terrain'
-    # tiles = 'cartodbpositron'
-    # titles = 'mapquestopen'
-    zoom = 12
-    m_1 = folium.Map(location=center, tiles=tiles, zoom_start=zoom)
-
-    dump = [Circle([r['lat'], r['lon']],
-                   radius=10 ** (2.0 + r['confidence']),
-                   color='lightgray',
-                   tooltip=r['text_en'],
-                   fill_color=color_func(r['sentiment']),
-                   fill_opacity=0.5,
-                   fill=True).add_to(m_1)
-            for i, r in df_geo.iterrows()]
-
-    return m_1
-
-# # ================================================
-# dummy functions until MonkeyLaern available again
-# --------------------------------------------------
-
-
-def get_mkl_st_dummy(df, MKL_AK, MKL_ST_MODEL_ID):
-
-    df_stx = df.copy()
-
-    classification = np.random.choice(
-        ['Positive', 'Negative', 'Neutral'], size=len(df))
-    confidence = np.random.random(size=len(df))
-    df_stx['sentiment'] = classification
-    df_stx['confidence'] = confidence
-
-    df_stx['sentiment_digit'] = df_stx['sentiment'].copy()
-    df_stx['sentiment_digit'].replace(
-        ['Positive', 'Neutral', 'Negative'], [1, 0, -1], inplace=True)
-
-    return df_stx
-
-
-# ====================================
-def get_mkl_ex_dummy(df, MKL_AK, MKL_EX_MODEL_ID):
-    df_kex = df.copy()
-    # ml = MonkeyLearn(MKL_AK)
-
-    df_kex['keyword'] = [[w.split()[np.array([len(s) for s in w.split()]).argmax()]
-                          for w in df.loc[i:i, 'text_en']][0] for i in range(len(df))]
-
-    return df_kex
-
 # ====================================
 
 
@@ -931,15 +848,11 @@ def aggregate_sentiment(df, freq='60S'):
     df_agg['count_neutral'] = df[df['sentiment'] == 'Neutral'].groupby(
         pd.Grouper(key='created_at', freq=freq)).count()['confidence_digit']
 
-#    df_agg.reset_index(inplace=True)
-
     return df_agg
 # --------------------------------------------------
 
 
 def aggregate_sentiment_tz(df, freq='60S'):
-
-    #    df['created_at_tz'] = df['created_at_tz'].astype('datetime64[ns]')
 
     df_agg = pd.DataFrame()
     df_agg['confidence_mean'] = df.groupby(pd.Grouper(
@@ -963,8 +876,6 @@ def aggregate_sentiment_tz(df, freq='60S'):
 
     df_agg['count_neutral'] = df[df['sentiment'] == 'Neutral'].groupby(
         pd.Grouper(key='created_at_tz', freq=freq)).count()['confidence_digit']
-
-#    df_agg.reset_index(inplace=True)
 
     return df_agg
 
@@ -995,7 +906,6 @@ def add_text_en(df, DEEPL_AK):
         df.loc[n_text*i:n_text*(i+1)-1, 'text_en'] = [t['text']
                                                       for t in response['translations']]
         i = i + 1
-#        break
 
     # check how much credit still remains
     URL_DEEPL_USAGE_QUERY = URL_DEEPL_USAGE + auth_key
@@ -1005,6 +915,93 @@ def add_text_en(df, DEEPL_AK):
 
     return df, usage
 
+# # ================================================
+# dummy functions until MonkeyLaern available again
+# --------------------------------------------------
+
+
+def get_mkl_st_dummy(df, MKL_AK, MKL_ST_MODEL_ID):
+
+    df_stx = df.copy()
+
+    classification = np.random.choice(
+        ['Positive', 'Negative', 'Neutral'], size=len(df))
+    confidence = np.random.random(size=len(df))
+    df_stx['sentiment'] = classification
+    df_stx['confidence'] = confidence
+
+    df_stx['sentiment_digit'] = df_stx['sentiment'].copy()
+    df_stx['sentiment_digit'].replace(
+        ['Positive', 'Neutral', 'Negative'], [1, 0, -1], inplace=True)
+
+    return df_stx
+
+
+# ====================================
+def get_mkl_ex_dummy(df, MKL_AK, MKL_EX_MODEL_ID):
+    df_kex = df.copy()
+
+    df_kex['keyword'] = [[w.split()[np.array([len(s) for s in w.split()]).argmax()]
+                          for w in df.loc[i:i, 'text_en']][0] for i in range(len(df))]
+
+    return df_kex
+
+
+# ============================================
+# play with wordcloud
+# --------------------------------------------
+
+
+def create_wordcloud(df, size=640):
+    width = size
+    height = size  # quadratisch
+    cm = 'inferno'  # 'plasma'  # 'Dark2' # 'Spectral'  # 'Plasma' 'RdBu', 'Pastel2'
+    text = ' '.join(df['keyword'].to_list())
+
+    wordcloud = WordCloud(background_color='white',
+                          colormap=cm,  # from matplotlib
+                          prefer_horizontal=0.9,
+                          width=width, height=height,
+                          mode='RGBA').generate(text)
+    return wordcloud
+
+
+def visualize_wc(wc):
+    #    layout = go.Layout(width=wc.width, height=wc.height,
+    layout = go.Layout(margin=dict(l=0, r=0, t=20, b=0),
+                       xaxis=dict(visible=False),
+                       yaxis=dict(visible=False))
+    trace = go.Image(z=wc, xaxis='x', yaxis='y')
+    fig = go.Figure(data=[trace], layout=layout)
+    return fig
+
+# --------------------------------------------
+
+
+def plot_sentiment(df_stx):
+
+    df_geo = extract_place(df_stx)
+    center = get_lat_lon()
+    tiles = 'openstreetmap'
+    # tiles = 'Stamen Terrain'
+    # tiles = 'cartodbpositron'
+    # tiles = 'mapquestopen'
+    zoom = 12
+    m_1 = folium.Map(location=center, tiles=tiles, zoom_start=zoom)
+
+    dump = [Circle([r['lat'], r['lon']],
+                   radius=10 ** (2.0 + r['confidence']),
+                   color='lightgray',
+                   tooltip=r['text_en'],
+                   fill_color=color_func(r['sentiment']),
+                   fill_opacity=0.5,
+                   fill=True).add_to(m_1)
+            for i, r in df_geo.iterrows()]
+
+    return m_1
+
+# ====================================
+# utility : quickly rewind data file
 # ====================================
 #  outfile = 'data/tweet_bus_de_en.csv'
 # remove_duplicates(outfile)
@@ -1015,13 +1012,16 @@ def remove_duplicates(outfile):
     print(len(df))
     df.drop_duplicates(subset=['id'], inplace=True)
     print(len(df))
+
 # convert utc to tz = 'Europe/Berlin'
     df['created_at_tz'] = [t.tz_localize('UTC').tz_convert(
         'Europe/Berlin') for t in df['created_at']]
     print(df['created_at_tz'].head(3))
     print(df['created_at'].head(3))
+
 # make sure 'id' is not converted to float
     df['id'] = df['id'].astype(np.int64)
+
 # this does not work
 #    df['created_at'] = df['created_at'].astype('datetime64[ns]')
     print(df.info())
@@ -1031,30 +1031,6 @@ def remove_duplicates(outfile):
     df = pd.read_csv(outfile)
     print(df.info())
 
-#
 # ====================================
-# scratch add_text_en
-# ====================================
-# outfile = './data/tweet_bus_de_en.csv'
-# df = pd.read_csv(outfile)
-# df.info()
-# len(df)
-
-# remove_duplicates(outfile)
-
-# df_agg = pd.DataFrame()
-# freq = 'BH'
-# # df_agg['confidence_mean'] =
-
-# df.groupby(pd.Grouper(
-#     key='created_at', freq=freq)).mean()['confidence_digit']
-
-# df.info()
-# df['created_at']
-
-# df['created_at'] = df['created_at'].astype('datetime64[ns]')
-# df['created_at_tz'] = df['created_at_tz'].astype('datetime64[ns]')
-# df.groupby(pd.Grouper(
-#     key='created_at_tz', freq='6H')).mean()['id']
-
+# END
 # ====================================
