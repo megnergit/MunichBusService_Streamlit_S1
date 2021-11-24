@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-import config
+# import config
 from mbs.mbs import *
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
@@ -9,52 +9,44 @@ import yaml
 # Authentication
 # ====================================
 
-AK = config.API_KEY  # not really necessary
-AKS = config.API_KEY_SECRET  # not really necessary
-BT = config.BEARER_TOKEN
+# AK = config.API_KEY  # not really necessary
+# AKS = config.API_KEY_SECRET  # not really necessary
+# BT = config.BEARER_TOKEN
 
-MKL_AK = config.MONKEYLEARN_API_KEY
-MKL_ST_MODEL_ID = config.MONKEYLEARN_SENTIMENT_MODEL_ID
-MKL_EX_MODEL_ID = config.MONKEYLEARN_KEYWORD_EXTRACTOR_MODEL_ID
-
-DATA_DIR = Path('./data')
 LOG_FILE = Path('./log/log_file.txt')
 LOG_FILE_COLOR = Path('./log/log_file_color.txt')
 NOTE_FILE = Path('./note/summary.yaml')
-
-DEEPL_AK = config.DEEPL_API_KEY
+DATA_DIR = Path('./data')
 
 size = 640
-input_file = DATA_DIR/'tweet_bus_de_en.csv'
+# input_file = DATA_DIR/'tweet_bus_de_en.csv'
 n_last = 30
-# center = (11.57540, 48.13714)
+# freq = '12H'
+# '120S' '2H' '1D'
+# # center = (11.57540, 48.13714)
 # ============================================
 # scratch streamlit
 # --------------------------------------------
-usecols = ['id', 'created_at', 'geo', 'place', 'coordinates', 'text',
-           'text_en', 'truncated', 'name', 'screen_name']
-df = pd.read_csv(input_file,
-                 parse_dates=['created_at'],
-                 usecols=usecols)
+df_agg = pd.read_csv(DATA_DIR / 'mbs_agg.csv',
+                     parse_dates=['created_at_tz'],
+                     index_col='created_at_tz')
 
-# =============================================
-# monkey learn
-# --------------------------------------------
-df_stx = get_mkl_st_dummy(df, MKL_AK)
-df_kex = get_mkl_ex_dummy(df_stx, MKL_AK)
-df_kex.to_csv(DATA_DIR/'mbs_kex.csv', index=False)
-df_geo = extract_place(df_kex)
-df_geo.to_csv(DATA_DIR/'mbs_geo.csv', index=False)
+df_agg.index.freq = df_agg.index.inferred_freq
+# df_agg['created_at'] = df_agg['created_at'].astype('datetime64[ns]')
+# df_agg['created_at_tz'] = df_agg['created_at_tz'].astype('datetime64[ns]')
 
-df_pn = add_sentiment_digit(df_kex)
-df_agg = aggregate_sentiment(df_pn, freq='12H')
-# '120S' '2H' '1D'
-df_agg.to_csv(DATA_DIR/'mbs_agg.csv', index=False)
+df_pn = pd.read_csv(DATA_DIR / 'mbs_pn.csv')
+# df_pn.head(3)
+# df_pn.info()
+
+df_pn['created_at'] = df_pn['created_at'].astype('datetime64[ns]')
+df_pn['created_at_tz'] = df_pn['created_at_tz'].astype('datetime64[ns]')
+
+df_kex = pd.read_csv(DATA_DIR / 'mbs_kex.csv')
 
 # --------------------------------------------
 # calculate daily aggregate
 # --------------------------------------------
-
 fig_agg = visualize_agg(df_agg, size)
 fig_count = visualize_count(df_agg, size)
 # --------------------------------------------
@@ -68,7 +60,6 @@ fig_wc = visualize_wc(wc)
 # folium
 # --------------------------------------------
 m_1 = plot_sentiment(df_kex)
-
 # --------------------------------------------
 # logfile
 # --------------------------------------------
@@ -179,11 +170,10 @@ st.dataframe(df_kex.drop(
 # --------------------------------------------
 # check duplication
 # --------------------------------------------
+# x = 1.4632553510175908e+18
+# str(x)
+# df.info()
+# df = pd.read_csv('data/tweet_bus_de_en_2021-11-24.csv')
+# len(df)
 # Path('.').cwd()
-# df = pd.read_csv('./data/tweet_bus_de_en.csv')
-# len(df)
-# df.drop_duplicates(subset=['id'], inplace=True)
-# len(df)
-
-
-# df.to_csv('./data/tweet_bus_de_en.csv', index=False)
+# df = pd.read_csv(

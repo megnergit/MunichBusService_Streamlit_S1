@@ -90,152 +90,240 @@ def query_text_mbs(BT):
     return URL, HEADERS
 
 # --------------------------------------------
-
-
-def collect_tweet_mbs(BT):
-    URL, HEADERS = query_text_mbs(BT)
-    response = requests.request("GET", URL, headers=HEADERS).json()
-    return response
+# def collect_tweet(BT):
+#     URL, HEADERS = query_text_mbs(BT)
+#     response = requests.request("GET", URL, headers=HEADERS).json()
+#     return response
 
 # --------------------------------------------
 # polling function : curate tweets collections
 # --------------------------------------------
 
 
-def polling_tweet_mbs(BT, DEEPL_AK,
-                      outfile='./data/tweet_bus_de_en.csv',
-                      n_stopper=3, t_sleep=1) -> None:
+def pre_polling(outfile,
+                LOG_FILE='./log/log_file.txt',
+                LOG_FILE_COLOR='./log/log_file_color.txt'):
+
     # -----------------------------
     # if there is outfile, read it
     # to get length of records
     # -----------------------------
-    LOG_FILE = './log/log_file.txt'
-    LOG_FILE_COLOR = './log/log_file_color.txt'
+    max_id_str = '0'
+    initial_length = 0
 
+    # -------------------------
     if Path(outfile).exists():
-        df_prev = pd.read_csv(outfile)
+        df_prev = pd.read_csv(outfile, dtype={'id': np.int64},
+                              parse_dates=['created_at'])
+
         backup_file = Path(str(outfile).replace('.csv', '') + '_' +
                            datetime.now().strftime('%Y-%m-%d') + '.csv')
         df_prev.to_csv(backup_file, index=False)
 
-        prev_length = len(df_prev)
-        revised_length = prev_length
+        initial_length = len(df_prev)
         max_id = df_prev['id'].max()
         max_id_str = str(max_id)
 
         del df_prev
 
-        since_id = max_id
-        since_id_str = max_id_str
+    # -------------------------
+    # log
+    m = max_id_str
+    print(f'\033[93mcurrent record length\033[0m {initial_length} \
+{m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]}')
 
+    with open(LOG_FILE, 'a') as log_file:
         print(
-            f'\033[93mcurrent record length\033[0m {prev_length} {since_id_str}')
+            f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} \
+current record length {initial_length} {max_id_str}',
+            file=log_file)
 
-        with open(LOG_FILE, 'a') as log_file:
-            print(
-                f'{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} \
-current record length {prev_length} {since_id_str}',
-                file=log_file)
-
-        m = since_id_str
-        with open(LOG_FILE_COLOR, 'a') as log_file_color:
-            print(
-                f'<b style="color:salmon">{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} </b> \
+    with open(LOG_FILE_COLOR, 'a') as log_file_color:
+        print(
+            f'<b style="color:salmon">{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} </b> \
 <b style="color:plum"> current record length</b> \
-{prev_length} {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]}',
-                file=log_file_color)
+{initial_length} {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]}',
+            file=log_file_color)
 
-# steelblue skyblue plum orchid darkorchid pink lightpink
+# # steelblue skyblue plum orchid darkorchid pink lightpink
+#     else:
+#         initial_length = 0
+# #        since_id_str = '0'
+# #        since_id = 0
+# #        max_id = 0
+#         max_id_str = '0'
 
-    else:
-        prev_length = 0
+    return max_id_str, initial_length
 
-        since_id_str = '0'
-        since_id = 0
-        max_id = since_id
-        max_id_str = str(max_id)
-        revised_length = prev_length
+# --------------------------------------------
 
+
+def polling_tweets(BT, DEEPL_AK,
+                   outfile='./data/tweet_bus_de_en.csv',
+                   n_stopper=3, t_sleep=1,
+                   MKL_AK='',
+                   MKL_ST_MODEL_ID='',
+                   MKL_EX_MODEL_ID='',
+                   DATA_DIR='./data',
+                   LOG_FILE='./log/log_file.txt',
+                   LOG_FILE_COLOR='./log/log_file_color.txt'
+                   ) -> None:
+
+    max_id_str, initial_length = pre_polling(outfile,
+                                             LOG_FILE=LOG_FILE,
+                                             LOG_FILE_COLOR=LOG_FILE_COLOR)
+
+    revised_length = initial_length
     df_list = []
     URL, HEADERS = query_text_mbs(BT)
 
     for i in range(n_stopper):
-        try:
-            t1 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            r = requests.request("GET", URL+'&since_id='+since_id_str,
-                                 headers=HEADERS).json()
+        prev_length = revised_length
+        new_max_str, revised_length, df_list = fetch_tweets(outfile,
+                                                            URL, HEADERS, max_id_str,
+                                                            df_list,
+                                                            revised_length,
+                                                            DEEPL_AK,
+                                                            LOG_FILE,
+                                                            LOG_FILE_COLOR)
 
-            if len(r['statuses']) == 0:
-                print(f'{i} \033[92mwaiting....\033[0m')
-                if i == (n_stopper - 1):
-                    break
-                time.sleep(t_sleep)
-                continue
+        # print(' ')
+        # print('len(df_list)', len(df_list))
+        # print('revised_length ', revised_length)
+        # print('old_max_str ', max_id_str)
+        # print('new_max_str ', new_max_str)
+        # pdb.set_trace()
+        # store relevant files
+#        if int(new_max_str) > int(max_id_str):
+        if revised_length > prev_length:
+            preprocess_mbs(outfile,
+                           MKL_AK, MKL_ST_MODEL_ID, MKL_EX_MODEL_ID,
+                           DATA_DIR)
 
-            clean_r = clean_response(r)
+        max_id_str = new_max_str
 
-            if len(r['statuses']) == 0:
-                print(f'{i} \033[93mwaiting....\033[0m')
-                if i == (n_stopper - 1):
-                    break
-                time.sleep(t_sleep)
-                continue
+        if i == (n_stopper - 1):
+            # ----
+            # logging purpose only
+            post_polling(new_max_str, revised_length, LOG_FILE=LOG_FILE,
+                         LOG_FILE_COLOR=LOG_FILE_COLOR)
 
-            max_id_str = r['search_metadata']['max_id_str']
-            max_id = r['search_metadata']['max_id']
-            m = max_id_str
-#            z = np.array([x['id'] for x in r['statuses']])
+            return  # exit without waiting
 
-            since_id = max_id
-            since_id_str = max_id_str
+        time.sleep(t_sleep)
 
-            # ---------------------------
-            df = response_to_csv(clean_r)
+    # post_polling(new_max_str, revised_length, LOG_FILE=LOG_FILE,
+    #              LOG_FILE_COLOR=LOG_FILE_COLOR)
 
-            length_retrieved = len(df)
-            df, usage = add_text_en(df, DEEPL_AK)
+#    return
 
-            df_list.append(df)
-            df = pd.concat(df_list, axis=0)
-            length_before = len(df)
+# --------------------------------------------
 
-            df.drop_duplicates(subset=['id'], inplace=True)
-            length_after = len(df)
 
-            df.sort_values(['id'], inplace=True)
+def fetch_tweets(outfile, URL, HEADERS, max_id_str,
+                 df_list,
+                 revised_length,
+                 DEEPL_AK,
+                 LOG_FILE,
+                 LOG_FILE_COLOR):
 
-            if Path(outfile).exists():
-                df.to_csv(outfile, mode='a', header=False, index=False)
-            else:
-                df.to_csv(outfile, index=False)
+    t1 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    new_max_str = max_id_str
 
-            print(f'\033[33m{t1} \033[91mmax_id \
+    r = requests.request("GET", URL+'&since_id='+max_id_str,
+                         headers=HEADERS).json()
+    if len(r['statuses']) == 0:
+        new_max_str = r['search_metadata']['max_id_str']
+        # print('')
+        # print('zero r')
+        # print('old_max_str ', max_id_str)
+        # print('new_max_str ', new_max_str)
+
+        return new_max_str, revised_length, df_list
+
+    clean_r = clean_response(r)
+    if len(clean_r['statuses']) == 0:
+        new_max_str = clean_r['search_metadata']['max_id_str']
+        # print('')
+        # print('zero clean_r')
+        # print('old_max_str ', max_id_str)
+        # print('new_max_str ', new_max_str)
+
+        return new_max_str, revised_length, df_list
+
+    # revise new_max_str
+    new_max_str = clean_r['search_metadata']['max_id_str']
+    # ---------------------------
+    # store file
+    # print('inside fetch', len(clean_r['statuses']))
+    # print('old_max_str', max_id_str)
+    # print('new_max_str', new_max_str)
+    df = response_to_csv(clean_r)
+    # =============================================
+    # DEEPL
+    # --------------------------------------------
+    df, usage = add_text_en(df, DEEPL_AK)
+    df_list.append(df)
+
+    df = pd.concat(df_list, axis=0)
+    df.drop_duplicates(subset=['id'], inplace=True)
+#    length_after = len(df)
+
+    df.sort_values(['id'], inplace=True)
+#    print(df.info())
+#    pdb.set_trace()
+    column_order = ['id', 'created_at', 'created_at_tz', 'geo', 'place', 'coordinates',
+                    'text', 'text_en', 'truncated', 'name', 'screen_name', ]
+    if Path(outfile).exists():
+        df.to_csv(outfile, mode='a',
+                  columns=column_order,
+                  header=False, index=False)
+    else:
+        df.to_csv(outfile,  columns=column_order, index=False)
+
+#    print('')
+#    print('in fetch')
+#    print(df.tail())
+#    pdb.set_trace()
+
+    retrieved_length = len(df)
+    revised_length = revised_length + retrieved_length
+    # ---------------------------
+    # log
+    m = new_max_str
+
+    print(f'\033[33m{t1} \033[91mmax_id \
 \033[0m{m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} \
-\033[96mret: \033[0m{length_retrieved:3} \
-\033[94mtot: \033[0m{length_after+prev_length: 5}\033[0m')
+\033[96mret: \033[0m{retrieved_length:3} \
+\033[94mtot: \033[0m{revised_length: 5}\033[0m')
 
-            with open(LOG_FILE, 'a') as log_file:
-                print(
-                    f'{t1} max_id {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} ret: {length_retrieved:3} tot: {length_after+prev_length:5}', end='', file=log_file)
+    with open(LOG_FILE, 'a') as log_file:
+        print(
+            f'{t1} max_id {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} \
+ret: {retrieved_length:3} tot: {revised_length:5}', end='', file=log_file)
 
-            with open(LOG_FILE_COLOR, 'a') as log_file_color:
-                print(
-                    f'<b style="color:salmon">{t1} </b> \
-                      <b style="color:indianred">max_id</b> \
+    with open(LOG_FILE_COLOR, 'a') as log_file_color:
+        print(
+            f'<b style="color:salmon">{t1} </b> \
+                    <b style="color:indianred">max_id</b> \
 {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]} \
-<b style="color:deeppink">ret</b>: {length_retrieved: 3} \
-<b style="color:firebrick">tot</b>: {length_after+prev_length: 5}', file=log_file_color)
+<b style="color:deeppink">ret</b>: {retrieved_length: 3} \
+<b style="color:firebrick">tot</b>: {revised_length: 5}',
+            file=log_file_color)
 
-            revised_length = revised_length + len(df)
-            time.sleep(t_sleep)
+    return new_max_str, revised_length, df_list
 
-        except (KeyError, IndexError) as e:
-            print(e)
-            break
+ # --------------------------------------------
+
+
+def post_polling(max_id_str, revised_length, LOG_FILE, LOG_FILE_COLOR):
+    # loggin only
 
     # terminal / text log file / for web page
-    print(
-        f'\033[94mrevised record length\033[0m {revised_length} {max_id_str}')
+    m = max_id_str
+
+    print(f'\033[94mrevised record length\033[0m {revised_length} \
+{m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]}')
 
     with open(LOG_FILE, 'a') as log_file:
         print(
@@ -243,7 +331,6 @@ current record length {prev_length} {since_id_str}',
 revised record length {revised_length} {max_id_str}',
             file=log_file)
 
-    m = max_id_str
     with open(LOG_FILE_COLOR, 'a') as log_file_color:
         print(
             f'<b style="color:salmon">{datetime.now().strftime("%Y-%m-%d %H:%M:%S")} </b> \
@@ -251,13 +338,64 @@ revised record length {revised_length} {max_id_str}',
 {revised_length} {m[0:4]} {m[4:8]} {m[8:12]} {m[12:16]} {m[16:20]}',
             file=log_file_color)
 
-# steelblue skyblue plum orchid darkorchid
+ # --------------------------------------------
+
+
+def preprocess_mbs(outfile,
+                   MKL_AK, MKL_ST_MODEL_ID, MKL_EX_MODEL_ID,
+                   DATA_DIR):
+
+    input_file = outfile
+    df = pd.read_csv(input_file,
+                     parse_dates=['created_at'])
+
+#    pdb.set_trace()  # already broken
+    # =============================================
+    # monkey learn
+    # --------------------------------------------
+    df_stx = get_mkl_st_dummy(df, MKL_AK, MKL_ST_MODEL_ID)
+    df_kex = get_mkl_ex_dummy(df_stx, MKL_AK, MKL_EX_MODEL_ID)
+    df_kex.to_csv(DATA_DIR/'mbs_kex.csv', index=False)
+
+#    print('df_kex inside preprocess_mbs')
+#     print(df_kex.info())
+#     pdb.set_trace()
+    # =============================================
+    # aggregate
+    # --------------------------------------------
+    df_pn = add_sentiment_digit(df_kex)
+    df_pn.to_csv(DATA_DIR/'mbs_pn.csv', index=False)
+
+#    print('df_pn')
+#    print(df_pn.info())
+#    pdb.set_trace()
+
+#    df_pn['created_at'] = df_pn['created_at'].astype('datetime64[ns]')
+    df_pn['created_at_tz'] = df_pn['created_at_tz'].astype('datetime64[ns]')
+    #    df_agg = aggregate_sentiment(df_pn, freq='12H')
+
+    df_agg = aggregate_sentiment_tz(df_pn, freq='12H')
+ #   print('df_agg')
+#    print(df_agg.info())
+#    pdb.set_trace()
+
+    # need to store index as well, since that is the datetime
+    df_agg.to_csv(DATA_DIR/'mbs_agg.csv')
+
+    # =============================================
+    # geo
+    # --------------------------------------------
+
+    df_geo = extract_place(df_kex)
+    df_geo.to_csv(DATA_DIR/'mbs_geo.csv', index=False)
+
 # --------------------------------------------
-# - flag when there is missing tweets
+# steelblue skyblue plum orchid darkorchid
 # --------------------------------------------
 
 
 def clean_response(response):
+
     EXCLUDE = ['MVGticker', 'S-Bahn München']
 
     new_response = []
@@ -272,13 +410,14 @@ def clean_response(response):
     return dict(statuses=new_response,
                 search_metadata=response['search_metadata'])
 
-# --------------------------------------------
 
+# --------------------------------------------
 
 def response_to_csv(response: dict) -> pd.DataFrame:
 
     # keys_all = response['statuses'][0].keys()
     # print(keys_all)
+
     keys = ['id', 'created_at',  'geo', 'place',
             'coordinates', 'text', 'truncated']
     user_keys = ['name', 'screen_name']
@@ -290,6 +429,12 @@ def response_to_csv(response: dict) -> pd.DataFrame:
     for u_k in user_keys:
         df[u_k] = [r['user'][u_k] for r in response['statuses']]
 
+    df['created_at'] = df['created_at'].astype('datetime64[ns]')
+    df['created_at_tz'] = [t.tz_localize('UTC').tz_convert(
+        'Europe/Berlin') for t in df['created_at']]
+
+#    print(df.info())
+#    pdb.set_trace()
     return df
 
 
@@ -344,7 +489,7 @@ def show_response(response) -> None:
 # ====================================
 
 
-def get_mkl_st(df, MKL_AK):
+def get_mkl_st(df, MKL_AK, MKL_ST_MODEL_ID):
 
     ml = MonkeyLearn(MKL_AK)
     df_stx = df.copy()
@@ -362,7 +507,6 @@ def get_mkl_st(df, MKL_AK):
 def sort_mkl_st(df):
     # expect :  df_stx
     # add columns ['sentiment_digit'], ['confidence_digit'],
-
     # remove neutral
     df_pn = df.copy()
 
@@ -404,7 +548,7 @@ def add_sentiment_digit(df):
 # ====================================
 
 
-def get_mkl_ex(df, MKL_AK):
+def get_mkl_ex(df, MKL_AK, MKL_EX_MODEL_ID):
     ml = MonkeyLearn(MKL_AK)
     df_kex = df.copy()
 
@@ -732,7 +876,7 @@ def plot_sentiment(df_stx):
 # --------------------------------------------------
 
 
-def get_mkl_st_dummy(df, MKL_AK):
+def get_mkl_st_dummy(df, MKL_AK, MKL_ST_MODEL_ID):
 
     df_stx = df.copy()
 
@@ -750,7 +894,7 @@ def get_mkl_st_dummy(df, MKL_AK):
 
 
 # ====================================
-def get_mkl_ex_dummy(df, MKL_AK):
+def get_mkl_ex_dummy(df, MKL_AK, MKL_EX_MODEL_ID):
     df_kex = df.copy()
     # ml = MonkeyLearn(MKL_AK)
 
@@ -790,6 +934,40 @@ def aggregate_sentiment(df, freq='60S'):
 #    df_agg.reset_index(inplace=True)
 
     return df_agg
+# --------------------------------------------------
+
+
+def aggregate_sentiment_tz(df, freq='60S'):
+
+    #    df['created_at_tz'] = df['created_at_tz'].astype('datetime64[ns]')
+
+    df_agg = pd.DataFrame()
+    df_agg['confidence_mean'] = df.groupby(pd.Grouper(
+        key='created_at_tz', freq=freq)).mean()['confidence_digit']
+    df_agg['confidence_std'] = df.groupby(pd.Grouper(
+        key='created_at_tz', freq=freq)).std()['confidence_digit']
+    df_agg['count'] = df.groupby(pd.Grouper(
+        key='created_at_tz', freq=freq)).count()['confidence_digit']
+
+    df_agg['positive_mean'] = df[df['sentiment'] == 'Positive'].groupby(
+        pd.Grouper(key='created_at_tz', freq=freq)).mean()['confidence_digit']
+
+    df_agg['count_positive'] = df[df['sentiment'] == 'Positive'].groupby(
+        pd.Grouper(key='created_at_tz', freq=freq)).count()['confidence_digit']
+
+    df_agg['negative_mean'] = df[df['sentiment'] == 'Negative'].groupby(
+        pd.Grouper(key='created_at_tz', freq=freq)).mean()['confidence_digit']
+
+    df_agg['count_negative'] = df[df['sentiment'] == 'Negative'].groupby(
+        pd.Grouper(key='created_at_tz', freq=freq)).count()['confidence_digit']
+
+    df_agg['count_neutral'] = df[df['sentiment'] == 'Neutral'].groupby(
+        pd.Grouper(key='created_at_tz', freq=freq)).count()['confidence_digit']
+
+#    df_agg.reset_index(inplace=True)
+
+    return df_agg
+
 # ====================================
 
 
@@ -810,15 +988,10 @@ def add_text_en(df, DEEPL_AK):
 
     i = 0
     n_text = 50
-#    n_text = 1
     while n_text*i < len(df):
         text = '&' + '&'.join(
             ['text='+d for d in df.loc[n_text*i:n_text*(i+1)-1, 'text']])
-        # here send request to DeepL
-
-#        pdb.set_trace()
         response = requests.request("POST", URL_DEEPL_QUERY+text).json()
-#        pdb.set_trace()
         df.loc[n_text*i:n_text*(i+1)-1, 'text_en'] = [t['text']
                                                       for t in response['translations']]
         i = i + 1
@@ -830,14 +1003,58 @@ def add_text_en(df, DEEPL_AK):
     print(
         f"\033[91mUsed:\033[93m {usage['character_count']}\033[0m/{usage['character_limit']}")
 
-#    pdb.set_trace()
     return df, usage
 
 # ====================================
+#  outfile = 'data/tweet_bus_de_en.csv'
+# remove_duplicates(outfile)
+
+
+def remove_duplicates(outfile):
+    df = pd.read_csv(outfile, parse_dates=['created_at'])
+    print(len(df))
+    df.drop_duplicates(subset=['id'], inplace=True)
+    print(len(df))
+# convert utc to tz = 'Europe/Berlin'
+    df['created_at_tz'] = [t.tz_localize('UTC').tz_convert(
+        'Europe/Berlin') for t in df['created_at']]
+    print(df['created_at_tz'].head(3))
+    print(df['created_at'].head(3))
+# make sure 'id' is not converted to float
+    df['id'] = df['id'].astype(np.int64)
+# this does not work
+#    df['created_at'] = df['created_at'].astype('datetime64[ns]')
+    print(df.info())
+    column_order = ['id', 'created_at', 'created_at_tz', 'geo', 'place', 'coordinates',
+                    'text', 'text_en', 'truncated', 'name', 'screen_name', ]
+    df.to_csv(outfile, index=False, columns=column_order)
+    df = pd.read_csv(outfile)
+    print(df.info())
+
+#
+# ====================================
 # scratch add_text_en
 # ====================================
-# response['translations']
 # outfile = './data/tweet_bus_de_en.csv'
 # df = pd.read_csv(outfile)
+# df.info()
+# len(df)
+
+# remove_duplicates(outfile)
+
+# df_agg = pd.DataFrame()
+# freq = 'BH'
+# # df_agg['confidence_mean'] =
+
+# df.groupby(pd.Grouper(
+#     key='created_at', freq=freq)).mean()['confidence_digit']
+
+# df.info()
+# df['created_at']
+
+# df['created_at'] = df['created_at'].astype('datetime64[ns]')
+# df['created_at_tz'] = df['created_at_tz'].astype('datetime64[ns]')
+# df.groupby(pd.Grouper(
+#     key='created_at_tz', freq='6H')).mean()['id']
 
 # ====================================
