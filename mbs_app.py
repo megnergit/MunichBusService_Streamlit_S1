@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-# import config
+import config
 from mbs.mbs import *
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh

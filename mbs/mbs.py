@@ -1031,6 +1031,14 @@ def remove_duplicates(outfile):
     df = pd.read_csv(outfile)
     print(df.info())
 
+
+# ====================================
+# scratch : duplicatino check
+# input_file = './data/tweet_bus_de_en.csv'
+# df = pd.read_csv(input_file)
+# print(len(df))
+# print(len(df.drop_duplicates(subset=['id'])))
+
 # ====================================
 # END
 # ====================================
